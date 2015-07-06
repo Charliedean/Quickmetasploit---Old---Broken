@@ -25,7 +25,8 @@ def get_ip_address(ifname):
 default_variables = frozenset('iface module'.split())
 
 module_variables = defaultdict(lambda : default_variables)
-module_variables.update({module: default_variables | delta_variables for module, delta_variables in
+
+module_variables.update({module: default_variables | other_variables for module, other_variables in
     {'exploit/multi/handler': {'payload', 'lhost', 'lport'},
     'auxiliary/scanner/smb/smb_login': {'rhost', 'rport'}
     }.items()})
@@ -34,7 +35,7 @@ module_variables.update({module: default_variables | delta_variables for module,
 ################################################################Main class for commands
 class Handler(cmd.Cmd):
 
-    lport = '4444'
+    lport = ''
     payload = 'windows/meterpreter/reverse_tcp'
     lhost = ''
     iface = 'eth0'
@@ -79,6 +80,10 @@ class Handler(cmd.Cmd):
         """Shows All The Avalible Payloads"""
         subprocess.call(["msfcli", "multi/handler", "P"])
         
+    def do_exit(self, line):
+        """Exits Program"""
+        sys.exit()
+    
     
     def do_showoptions(self, line):
         """Shows Options For Module"""
