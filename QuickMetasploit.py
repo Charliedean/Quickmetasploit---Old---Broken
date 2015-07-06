@@ -43,8 +43,6 @@ class Handler(cmd.Cmd):
     rport = ''
 
     possible_modules = ('exploit/multi/handler', 'auxiliary/scanner/smb/smb_login')
-    def do_test(self, line):
-        print self.variables
         
         
     def __init__(self):
