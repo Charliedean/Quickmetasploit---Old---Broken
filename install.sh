@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 chmod +x QuickMetasploit.py
-ln -s QuickMetasploit.py /usr/bin/quickmetasploit
+ln -s `pwd`/QuickMetasploit.py /usr/local/bin/quickmetasploit 
 echo "Quick Metasploit Has Been Installed, Run quickmetasploit From A Shell To Start"
