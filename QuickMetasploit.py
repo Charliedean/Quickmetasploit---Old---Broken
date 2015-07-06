@@ -107,7 +107,7 @@ class Handler(cmd.Cmd):
             subprocess.call(["msfcli", self.module, "payload=%s" %self.payload, "lhost=%s" %self.lhost, "lport=%s" %self.lport, "E"])
             
         elif self.module == "auxiliary/scanner/smb/smb_login":
-            subprocess.call(["msfcli", self.module, "rhosts=%" %self.rhosts, "rport=%" %self.rport, E])
+            subprocess.call(["msfcli", self.module, "rhosts=%s" %self.rhosts, "rport=%s" %self.rport, "E"])
             
 ################################################################
 
