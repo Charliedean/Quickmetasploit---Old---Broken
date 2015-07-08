@@ -8,11 +8,13 @@ import time
 import socket
 import fcntl
 import struct
+import math
+import random
 config = SafeConfigParser()
 config.read('config.ini')
 DEFAULT_MODULE = config.get('main', 'Module')
 DEFAULT_PAYLOAD = config.get('main' , 'Payload')
-
+COLOURS = ['\033[94m', '\033[92m', '\033[93m', '\033[91m', '\033[0m']
 ###########################################################################################################################################################################Adding Colours 
 class colours:
     BLUE = '\033[94m'
@@ -20,6 +22,8 @@ class colours:
     YELLOW = '\033[93m'
     RED = '\033[91m'
     WHITE = '\033[0m'
+    
+
 #########################################################################################################################################################################################
 ########################################################################################################################################################Used for getting local ip address
 def get_ip_address(ifname):
@@ -71,10 +75,6 @@ class Handler(cmd.Cmd):
         self.lhost = get_ip_address(self.iface)
         self.variables = module_variables[self.module]
         
-        
-
-
-
     def do_set(self, line):
         """Use Tab To Show Variables You Can Set"""
         try:
@@ -110,6 +110,17 @@ class Handler(cmd.Cmd):
         else:
             return []
 ########################################################################################################################################################################################
+    def do_easteregg(self, line):
+        easter = raw_input("Enter The Code: ")
+        counter = 0
+        while True:
+            if easter == "1337":
+                print " "*(49 - int(48*math.sin(counter))) + random.choice(COLOURS) + "*" + '\033[0m'
+                time.sleep(0.07)
+                counter += 0.1
+            else:
+                print "Wrong Code!"
+
     def do_listallpayloads(self, line):
         """Shows All The Avalible Payloads"""
         subprocess.call(["msfcli", "multi/handler", "P"])
@@ -172,15 +183,17 @@ class Handler(cmd.Cmd):
 ################################################################################################################################################################Used for import as modules
 if __name__ == '__main__':
     print colours.RED + "=====================================================" + colours.WHITE
-    print colours.BLUE + "-- Quick Metasploit" + colours.WHITE
-    print colours.BLUE + "-- Type Help To List All Commands" + colours.WHITE
-    print colours.BLUE + "-- Type Help (Command) For Specific Help" + colours.WHITE
-    print colours.BLUE + "-- Local Ip Will Be Automaticaly Set" + colours.WHITE
-    print colours.BLUE + "-- CTRL + C To Exit" + colours.WHITE
+    print colours.BLUE + "--            Quick Metasploit" + colours.WHITE
+    print colours.BLUE + "--    Type Help To List All Commands" + colours.WHITE
+    print colours.BLUE + "--  Type Help (Command) For Specific Help" + colours.WHITE
+    print colours.BLUE + "--     Local Ip Will Be Automaticaly Set" + colours.WHITE
     print colours.BLUE + "-- Quick Metasploit Uses Defaults Set In Config.ini" +colours.WHITE
+    print colours.BLUE + "--            CTRL + C To Exit" + colours.WHITE
+    print colours.BLUE + "--                  1337" + colours.WHITE
     print colours.RED + "=====================================================" + colours.WHITE
     print colours.GREEN + "Default Module Is %s" %DEFAULT_MODULE + colours.WHITE
     print colours.GREEN + "Default Payload Is %s" %DEFAULT_PAYLOAD + colours.WHITE
+    print colours.RED + "=====================================================" + colours.WHITE
 ##########################################################################################################################################################################################
 #############################################################################################################################################Catches Ctrl C and asks user for confirmation
     while(True):
