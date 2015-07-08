@@ -16,8 +16,10 @@ config = SafeConfigParser()
 config.read('config.ini')
 DEFAULT_MODULE = config.get('main', 'Module')
 DEFAULT_PAYLOAD = config.get('main' , 'Payload')
+
 COLOURS = ['\033[94m', '\033[92m', '\033[93m', '\033[91m', '\033[0m']
-WIDTH = 60
+
+WIDTH = 60 #Change to terminal size when updated
 
 class colours:
     BLUE = '\033[94m'
@@ -25,18 +27,20 @@ class colours:
     YELLOW = '\033[93m'
     RED = '\033[91m'
     WHITE = '\033[0m'
-    
 
-def get_ip_address(ifname):
+
+def get_ip_address(ifname): # Gets ip from interface using sockets
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
         0x8915,  # SIOCGIFADDR
         struct.pack('256s', ifname[:15])
     )[20:24])
-    
+
 default_variables = frozenset('iface module defaultmodule defaultpayload'.split())
+
 module_variables = defaultdict(lambda : default_variables)
+
 module_variables.update({module: default_variables | other_variables for module, other_variables in
     {'exploit/multi/handler': {'payload', 'lhost', 'lport'},
     'auxiliary/scanner/smb/smb_login': {'rhosts', 'rport'},
@@ -83,6 +87,9 @@ class Handler(cmd.Cmd):
             if firstvalue == 'module':
                 module = secondvalue = short_module_names[secondvalue]
                 self.variables = module_variables[module]
+            elif firstvalue == 'iface':
+                secondvalue = iface = secondvalue
+                self.lhost = get_ip_address(iface)
             setattr(self, firstvalue, secondvalue)
 
             config.set('main' , 'Module' , self.defaultmodule)
@@ -134,7 +141,6 @@ class Handler(cmd.Cmd):
 
     def do_showoptions(self, line):
         """Shows Options For Module"""
-        self.lhost = get_ip_address(self.iface)
         if self.module == "exploit/multi/handler":
             print colours.RED +"="*WIDTH                                 + colours.WHITE
             print colours.BLUE + "--payload =", self.payload             + colours.WHITE
@@ -190,10 +196,12 @@ if __name__ == '__main__':
     print colours.BLUE + "-- Type Help (Command) For Specific Help"       + colours.WHITE
     print colours.BLUE + "-- Local Ip Will Be Automaticaly Set"           + colours.WHITE
     print colours.BLUE + "-- CTRL + C To Exit"                            + colours.WHITE
+    print colours.BLUE + "-- Written By CharlieDean"                      + colours.WHITE
     print colours.RED + "="*WIDTH                                         + colours.WHITE
-    print colours.GREEN + "-- Default Module Is %s" %DEFAULT_MODULE       + colours.WHITE
-    print colours.GREEN + "-- Default Payload Is %s" %DEFAULT_PAYLOAD     + colours.WHITE
+    print colours.GREEN + "-- Default Module is %s" %DEFAULT_MODULE       + colours.WHITE
+    print colours.GREEN + "-- Default Payload is %s" %DEFAULT_PAYLOAD     + colours.WHITE
     print colours.RED + "="*WIDTH                                         + colours.WHITE
+
     while(True):
         try:
             prompt = Handler()
@@ -205,7 +213,7 @@ if __name__ == '__main__':
                     time.sleep(0.05)
                     exit = raw_input (colours.GREEN + "\n\nAre You Sure You Want To Quit? y/[n] (>>)" + colours.WHITE)
                     if exit and exit.lower()[0] == "y":
-                        print colours.RED + "Exiting...*1337*" + colours.WHITE
+                        print colours.RED + "Exiting...*e48e13207341b6bffb7fb1622282247b*" + colours.WHITE
                         sys.exit()
                     else:
                         prompt.cmdloop('')
