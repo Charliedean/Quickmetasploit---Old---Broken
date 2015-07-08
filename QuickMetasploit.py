@@ -74,6 +74,7 @@ class Handler(cmd.Cmd):
     possible_community = ('public' , 'private' , 'admin' , 'CISCO' , 'system' , 'switch' , 'secret')
     possible_usernames = ('foobar' , 'root' , 'admin' , 'sysadmin')
     possible_payloads = ('windows/meterpreter/reverse_tcp' , 'linux/shell/revserse_tcp')
+    possible_iface = ('eth0', 'lo' , 'wlan0')
 
     def __init__(self):
         cmd.Cmd.__init__(self)
@@ -91,11 +92,8 @@ class Handler(cmd.Cmd):
                 secondvalue = iface = secondvalue
                 self.lhost = get_ip_address(iface)
             setattr(self, firstvalue, secondvalue)
-
             config.set('main' , 'Module' , self.defaultmodule)
             config.set('main' , 'Payload' , self.defaultpayload)
-            with open('config.ini', 'w') as f:
-                config.write(f)
 
         except ValueError:
             print colours.RED + "="*WIDTH                                       + colours.WHITE
@@ -136,6 +134,8 @@ class Handler(cmd.Cmd):
             return [t for t in self.possible_usernames if t.startswith(text)]
         elif cmdtokens == ['set', 'payload'] or cmdtokens == ['set', 'defaultpayload']:
             return [e for e in self.possible_payloads if e.startswith(text)]
+        elif cmdtokens == ['set', 'iface']:
+            return [r for r in self.possible_iface if r.startswith(text)]
         else:
             return []
 
@@ -190,17 +190,17 @@ class Handler(cmd.Cmd):
             print "The module (%s) isn't supported yet!" % self.module
 
 if __name__ == '__main__':
-    print colours.RED + "="*WIDTH                                         + colours.WHITE
-    print colours.BLUE + "-- ( ͡° ͜ʖ ͡°) Quick Metasploit ( ͡° ͜ʖ ͡°)"      + colours.WHITE
-    print colours.BLUE + "-- Type Help To List All Commands"              + colours.WHITE
-    print colours.BLUE + "-- Type Help (Command) For Specific Help"       + colours.WHITE
-    print colours.BLUE + "-- Local Ip Will Be Automaticaly Set"           + colours.WHITE
-    print colours.BLUE + "-- CTRL + C To Exit"                            + colours.WHITE
-    print colours.BLUE + "-- Written By CharlieDean"                      + colours.WHITE
-    print colours.RED + "="*WIDTH                                         + colours.WHITE
-    print colours.GREEN + "-- Default Module is %s" %DEFAULT_MODULE       + colours.WHITE
-    print colours.GREEN + "-- Default Payload is %s" %DEFAULT_PAYLOAD     + colours.WHITE
-    print colours.RED + "="*WIDTH                                         + colours.WHITE
+    print colours.RED + "="*WIDTH                                             + colours.WHITE
+    print colours.BLUE + "-- ––•–√\/––√\/––•––", colours.RED + "QuickMetasploit", colours.BLUE + "––•–√\/––√\/––•––" + colours.WHITE
+    print colours.BLUE + "-- Type Help To List All Commands"                  + colours.WHITE
+    print colours.BLUE + "-- Type Help (Command) For Specific Help"           + colours.WHITE
+    print colours.BLUE + "-- Local Ip Will Be Automaticaly Set"               + colours.WHITE
+    print colours.BLUE + "-- CTRL + C To Exit"                                + colours.WHITE
+    print colours.BLUE + "-- Written By CharlieDean"                          + colours.WHITE
+    print colours.RED + "="*WIDTH                                             + colours.WHITE
+    print colours.GREEN + "-- Default Module is %s" %DEFAULT_MODULE           + colours.WHITE
+    print colours.GREEN + "-- Default Payload is %s" %DEFAULT_PAYLOAD         + colours.WHITE
+    print colours.RED + "="*WIDTH                                             + colours.WHITE
 
     while(True):
         try:
@@ -214,6 +214,8 @@ if __name__ == '__main__':
                     exit = raw_input (colours.GREEN + "\n\nAre You Sure You Want To Quit? y/[n] (>>)" + colours.WHITE)
                     if exit and exit.lower()[0] == "y":
                         print colours.RED + "Exiting...*e48e13207341b6bffb7fb1622282247b*" + colours.WHITE
+                        with open('config.ini', 'w') as f:
+                            config.write(f)
                         sys.exit()
                     else:
                         prompt.cmdloop('')
