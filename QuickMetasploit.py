@@ -184,11 +184,10 @@ class Handler(cmd.Cmd):
 if __name__ == '__main__':
     print colours.RED + "=====================================================" + colours.WHITE
     print colours.BLUE + "--            Quick Metasploit" + colours.WHITE
-    print colours.BLUE + "--    Type Help To List All Commands" + colours.WHITE
-    print colours.BLUE + "--  Type Help (Command) For Specific Help" + colours.WHITE
-    print colours.BLUE + "--     Local Ip Will Be Automaticaly Set" + colours.WHITE
-    print colours.BLUE + "-- Quick Metasploit Uses Defaults Set In Config.ini" +colours.WHITE
-    print colours.BLUE + "--            CTRL + C To Exit" + colours.WHITE
+    print colours.BLUE + "--     Type Help To List All Commands" + colours.WHITE
+    print colours.BLUE + "--   Type Help (Command) For Specific Help" + colours.WHITE
+    print colours.BLUE + "--      Local Ip Will Be Automaticaly Set" + colours.WHITE
+    print colours.BLUE + "--             CTRL + C To Exit" + colours.WHITE
     print colours.BLUE + "--                  1337" + colours.WHITE
     print colours.RED + "=====================================================" + colours.WHITE
     print colours.GREEN + "Default Module Is %s" %DEFAULT_MODULE + colours.WHITE
