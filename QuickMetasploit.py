@@ -115,8 +115,8 @@ class Handler(cmd.Cmd):
         counter = 0
         while True:
             if easter == "1337":
-                print " "*(49 - int(46*math.sin(counter))) + random.choice(COLOURS) + "*" + '\033[0m'
-                time.sleep(0.05)
+                print " "*(49 - int(46*math.sin(counter))) + random.choice(COLOURS) + "**--CharlieDean--**--Dario--**--Alex--**" + '\033[0m'
+                time.sleep(0.04)
                 counter += 0.1
             else:
                 print "Wrong Code!"
