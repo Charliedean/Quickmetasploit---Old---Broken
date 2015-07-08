@@ -1,4 +1,5 @@
 #!/usr/bin/python2.7
+# -*- coding: utf-8 -*-
 from collections import defaultdict
 from ConfigParser import SafeConfigParser
 import cmd 
@@ -10,12 +11,14 @@ import fcntl
 import struct
 import math
 import random
+
 config = SafeConfigParser()
 config.read('config.ini')
 DEFAULT_MODULE = config.get('main', 'Module')
 DEFAULT_PAYLOAD = config.get('main' , 'Payload')
 COLOURS = ['\033[94m', '\033[92m', '\033[93m', '\033[91m', '\033[0m']
-###########################################################################################################################################################################Adding Colours 
+WIDTH = 60
+
 class colours:
     BLUE = '\033[94m'
     GREEN = '\033[92m'
@@ -24,8 +27,6 @@ class colours:
     WHITE = '\033[0m'
     
 
-#########################################################################################################################################################################################
-########################################################################################################################################################Used for getting local ip address
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
@@ -33,7 +34,7 @@ def get_ip_address(ifname):
         0x8915,  # SIOCGIFADDR
         struct.pack('256s', ifname[:15])
     )[20:24])
-#######################################################################################################################################################################################
+    
 default_variables = frozenset('iface module defaultmodule defaultpayload'.split())
 module_variables = defaultdict(lambda : default_variables)
 module_variables.update({module: default_variables | other_variables for module, other_variables in
@@ -48,6 +49,7 @@ short_module_names = {'smb_login': 'auxiliary/scanner/smb/smb_login',
                       'rlogin_login': 'auxiliary/scanner/rservices/rlogin_login',
                       'snmp_enum': 'auxiliary/scanner/snmp/snmp_enum'
                      }
+
 class Handler(cmd.Cmd):
     lport = ''
     payload = DEFAULT_PAYLOAD
@@ -63,18 +65,17 @@ class Handler(cmd.Cmd):
     snmpversion = '1'
     defaultmodule = config.get('main', 'Module')
     defaultpayload = config.get('main', 'Payload')
-#####################################################################################################################################################Possible strings for tab completetion
     possible_modules = short_module_names.keys()
     possible_snmpversion = ('1' ,'2c')
     possible_community = ('public' , 'private' , 'admin' , 'CISCO' , 'system' , 'switch' , 'secret')
     possible_usernames = ('foobar' , 'root' , 'admin' , 'sysadmin')
     possible_payloads = ('windows/meterpreter/reverse_tcp' , 'linux/shell/revserse_tcp')
-#########################################################################################################################################################################################
+
     def __init__(self):
         cmd.Cmd.__init__(self)
         self.lhost = get_ip_address(self.iface)
         self.variables = module_variables[self.module]
-        
+
     def do_set(self, line):
         """Use Tab To Show Variables You Can Set"""
         try:
@@ -83,16 +84,37 @@ class Handler(cmd.Cmd):
                 module = secondvalue = short_module_names[secondvalue]
                 self.variables = module_variables[module]
             setattr(self, firstvalue, secondvalue)
+
             config.set('main' , 'Module' , self.defaultmodule)
             config.set('main' , 'Payload' , self.defaultpayload)
             with open('config.ini', 'w') as f:
                 config.write(f)
+
         except ValueError:
-            print colours.RED + "==========================================" + colours.WHITE
-            print colours.BLUE + "Please choose a option and a value to set!" + colours.WHITE
-            print colours.RED + "==========================================" + colours.WHITE
-            
-###################################################################################################################################################################Autocompletion shitt
+            print colours.RED + "="*WIDTH                                       + colours.WHITE
+            print colours.BLUE + "Please choose a option and a value to set!"   + colours.WHITE
+            print colours.RED + "="*WIDTH                                       + colours.WHITE
+
+    def do_easteregg(self, line):
+        easter = raw_input("Enter The Code: ")
+        counter = 0
+        while True:
+            if easter == "1337":
+                print " "*(49 - int(46*math.sin(counter))) + random.choice(COLOURS) + "**--CharlieDean--**--Dario--**--Alex--**" + '\033[0m'
+                print " "*(49 - int(46*math.cos(counter))) + random.choice(COLOURS) + "**--CharlieDean--**--Dario--**--Alex--**" + '\033[0m'
+                time.sleep(0.01)
+                counter += 0.1
+            else:
+                print "Wrong Code!"
+
+    def do_listallpayloads(self, line):
+        """Shows All The Avalible Payloads"""
+        subprocess.call(["msfcli", "multi/handler", "P"])
+
+    def do_exit(self, line):
+        """Exits Program"""
+        sys.exit()
+
     def complete_set(self, text, line, begidx, endidx):
         cmdtokens = line.split(' ')[:-1]
         if cmdtokens == ['set']:
@@ -109,93 +131,69 @@ class Handler(cmd.Cmd):
             return [e for e in self.possible_payloads if e.startswith(text)]
         else:
             return []
-########################################################################################################################################################################################
-    def do_easteregg(self, line):
-        easter = raw_input("Enter The Code: ")
-        counter = 0
-        while True:
-            if easter == "1337":
-                print " "*(49 - int(46*math.sin(counter))) + random.choice(COLOURS) + "**--CharlieDean--**--Dario--**--Alex--**" + '\033[0m'
-                print " "*(49 - int(46*math.cos(counter))) + random.choice(COLOURS) + "**--CharlieDean--**--Dario--**--Alex--**" + '\033[0m'
-                time.sleep(0.01)
-                counter += 0.1
-            else:
-                print "Wrong Code!"
-
-    def do_listallpayloads(self, line):
-        """Shows All The Avalible Payloads"""
-        subprocess.call(["msfcli", "multi/handler", "P"])
-        
-    def do_exit(self, line):
-        """Exits Program"""
-        sys.exit()
 
     def do_showoptions(self, line):
         """Shows Options For Module"""
         self.lhost = get_ip_address(self.iface)
         if self.module == "exploit/multi/handler":
-            print colours.RED +"========================================" + colours.WHITE
-            print colours.BLUE + "--payload =", self.payload + colours.WHITE
-            print colours.BLUE + "--lhost =", self.lhost + colours.WHITE
-            print colours.BLUE + "--lport =", self.lport + colours.WHITE
-            print colours.BLUE + "--module =", self.module + colours.WHITE
-            print colours.RED + "========================================" + colours.WHITE
+            print colours.RED +"="*WIDTH                                 + colours.WHITE
+            print colours.BLUE + "--payload =", self.payload             + colours.WHITE
+            print colours.BLUE + "--lhost =", self.lhost                 + colours.WHITE
+            print colours.BLUE + "--lport =", self.lport                 + colours.WHITE
+            print colours.BLUE + "--module =", self.module               + colours.WHITE
+            print colours.RED + "="*WIDTH                                + colours.WHITE
         elif self.module == "auxiliary/scanner/smb/smb_login":
-            print colours.RED + "========================================" + colours.WHITE
-            print colours.BLUE + "--rhosts =", self.rhosts + colours.WHITE
-            print colours.BLUE + "--rport =", self.rport + colours.WHITE
-            print colours.BLUE + "--module =", self.module + colours.WHITE
-            print colours.RED + "========================================" + colours.WHITE
+            print colours.RED + "="*WIDTH                                + colours.WHITE
+            print colours.BLUE + "--rhosts =", self.rhosts               + colours.WHITE
+            print colours.BLUE + "--rport =", self.rport                 + colours.WHITE
+            print colours.BLUE + "--module =", self.module               + colours.WHITE
+            print colours.RED + "="*WIDTH                                + colours.WHITE
         elif self.module == "auxiliary/scanner/rservices/rlogin_login":
-            print colours.RED + "========================================" + colours.WHITE
-            print colours.BLUE + "--rhosts =", self.rhosts + colours.WHITE
-            print colours.BLUE + "--rport =", self.rport + colours.WHITE
-            print colours.BLUE + "--module =", self.module + colours.WHITE
-            print colours.BLUE + "--username =", self.username + colours.WHITE
-            print colours.BLUE + "--fromuser =", self.fromuser + colours.WHITE
-            print colours.RED + "========================================" + colours.WHITE
+            print colours.RED + "="*WIDTH                                + colours.WHITE
+            print colours.BLUE + "--rhosts =", self.rhosts               + colours.WHITE
+            print colours.BLUE + "--rport =", self.rport                 + colours.WHITE
+            print colours.BLUE + "--module =", self.module               + colours.WHITE
+            print colours.BLUE + "--username =", self.username           + colours.WHITE
+            print colours.BLUE + "--fromuser =", self.fromuser           + colours.WHITE
+            print colours.RED + "="*WIDTH                                + colours.WHITE
         elif self.module == "auxiliary/scanner/snmp/snmp_enum":
-            print colours.RED + "========================================" + colours.WHITE
-            print colours.BLUE + "--rhosts =", self.rhosts + colours.WHITE
-            print colours.BLUE + "--rport =", self.rport + colours.WHITE
-            print colours.BLUE + "--module =", self.module + colours.WHITE
-            print colours.BLUE + "--community =", self.community + colours.WHITE
-            print colours.BLUE + "--snmpversion =", self.snmpversion + colours.WHITE
-            print colours.RED + "========================================" + colours.WHITE
+            print colours.RED + "="*WIDTH + colours.WHITE
+            print colours.BLUE + "--rhosts =", self.rhosts               + colours.WHITE
+            print colours.BLUE + "--rport =", self.rport                 + colours.WHITE
+            print colours.BLUE + "--module =", self.module               + colours.WHITE
+            print colours.BLUE + "--community =", self.community         + colours.WHITE
+            print colours.BLUE + "--snmpversion =", self.snmpversion     + colours.WHITE
+            print colours.RED + "="*WIDTH                                + colours.WHITE
         else:
             print "The module (%s) isn't supported yet!" % self.module
-########################################################################################################################################################################MSFCLI Subprocess
+
     def do_run(self, line):
         """Runs The Module With Settings"""
         if self.module == "exploit/multi/handler":
             subprocess.call(["msfcli", self.module, "payload=%s" %self.payload, "lhost=%s" %self.lhost, "lport=%s" %self.lport, "E"])
-            
+
         elif self.module == "auxiliary/scanner/smb/smb_login":
             subprocess.call(["msfcli", self.module, "rhosts=%s" %self.rhosts, "rport=%s" %self.rport, "E"])
-            
+
         elif self.module == "auxiliary/scanner/rservices/rlogin_login":
             subprocess.call(["msfcli", self.module, "rhosts=%s" %self.rhosts, "rport=%s" %self.rport, "username=%s" %self.username, "fromuser=%s" %self.fromuser, "E"])
-            
+
         elif self.module == "auxiliary/scanner/snmp/snmp_enum":
             subprocess.call(["msfcli", self.module, "rhosts=%s" %self.rhosts, "rport=%s" %self.rport, "community=%s" %self.community, "version=%s" %self.snmpversion, "E"])
         else:
             print "The module (%s) isn't supported yet!" % self.module
-#########################################################################################################################################################################################
-################################################################################################################################################################Used for import as modules
+
 if __name__ == '__main__':
-    print colours.RED + "=====================================================" + colours.WHITE
-    print colours.BLUE + "--            Quick Metasploit" + colours.WHITE
-    print colours.BLUE + "--     Type Help To List All Commands" + colours.WHITE
-    print colours.BLUE + "--   Type Help (Command) For Specific Help" + colours.WHITE
-    print colours.BLUE + "--      Local Ip Will Be Automaticaly Set" + colours.WHITE
-    print colours.BLUE + "--             CTRL + C To Exit" + colours.WHITE
-    print colours.BLUE + "--                  1337" + colours.WHITE
-    print colours.RED + "=====================================================" + colours.WHITE
-    print colours.GREEN + "Default Module Is %s" %DEFAULT_MODULE + colours.WHITE
-    print colours.GREEN + "Default Payload Is %s" %DEFAULT_PAYLOAD + colours.WHITE
-    print colours.RED + "=====================================================" + colours.WHITE
-##########################################################################################################################################################################################
-#############################################################################################################################################Catches Ctrl C and asks user for confirmation
+    print colours.RED + "="*WIDTH                                         + colours.WHITE
+    print colours.BLUE + "-- ( ͡° ͜ʖ ͡°) Quick Metasploit ( ͡° ͜ʖ ͡°)"      + colours.WHITE
+    print colours.BLUE + "-- Type Help To List All Commands"              + colours.WHITE
+    print colours.BLUE + "-- Type Help (Command) For Specific Help"       + colours.WHITE
+    print colours.BLUE + "-- Local Ip Will Be Automaticaly Set"           + colours.WHITE
+    print colours.BLUE + "-- CTRL + C To Exit"                            + colours.WHITE
+    print colours.RED + "="*WIDTH                                         + colours.WHITE
+    print colours.GREEN + "-- Default Module Is %s" %DEFAULT_MODULE       + colours.WHITE
+    print colours.GREEN + "-- Default Payload Is %s" %DEFAULT_PAYLOAD     + colours.WHITE
+    print colours.RED + "="*WIDTH                                         + colours.WHITE
     while(True):
         try:
             prompt = Handler()
@@ -207,11 +205,10 @@ if __name__ == '__main__':
                     time.sleep(0.05)
                     exit = raw_input (colours.GREEN + "\n\nAre You Sure You Want To Quit? y/[n] (>>)" + colours.WHITE)
                     if exit and exit.lower()[0] == "y":
-                        print colours.RED + "Exiting..." + colours.WHITE
+                        print colours.RED + "Exiting...*1337*" + colours.WHITE
                         sys.exit()
                     else:
                         prompt.cmdloop('')
-                
+
                 except KeyboardInterrupt:
                     pass
-##########################################################################################################################################################################################
