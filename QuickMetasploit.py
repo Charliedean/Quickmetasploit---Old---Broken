@@ -1,5 +1,6 @@
 #!/usr/bin/python2.7
 from collections import defaultdict
+from ConfigParser import SafeConfigParser
 import cmd 
 import subprocess
 import sys
@@ -7,8 +8,10 @@ import time
 import socket
 import fcntl
 import struct
-
-DEFAULT_MODULE = 'multi_handler'
+config = SafeConfigParser()
+config.read('config.ini')
+DEFAULT_MODULE = config.get('main', 'Module')
+DEFAULT_PAYLOAD = config.get('main' , 'Payload')
 
 ###########################################################################################################################################################################Adding Colours 
 class colours:
@@ -27,7 +30,7 @@ def get_ip_address(ifname):
         struct.pack('256s', ifname[:15])
     )[20:24])
 #######################################################################################################################################################################################
-default_variables = frozenset('iface module'.split())
+default_variables = frozenset('iface module defaultmodule defaultpayload'.split())
 module_variables = defaultdict(lambda : default_variables)
 module_variables.update({module: default_variables | other_variables for module, other_variables in
     {'exploit/multi/handler': {'payload', 'lhost', 'lport'},
@@ -43,7 +46,7 @@ short_module_names = {'smb_login': 'auxiliary/scanner/smb/smb_login',
                      }
 class Handler(cmd.Cmd):
     lport = ''
-    payload = ''
+    payload = DEFAULT_PAYLOAD
     lhost = ''
     iface = 'eth0'
     module = short_module_names[DEFAULT_MODULE]
@@ -54,6 +57,8 @@ class Handler(cmd.Cmd):
     fromuser = 'root'
     community = 'public'
     snmpversion = '1'
+    defaultmodule = ''
+    defaultpayload = ''
 #####################################################################################################################################################Possible strings for tab completetion
     possible_modules = short_module_names.keys()
     possible_snmpversion = ('1' ,'2c')
@@ -65,6 +70,10 @@ class Handler(cmd.Cmd):
         cmd.Cmd.__init__(self)
         self.lhost = get_ip_address(self.iface)
         self.variables = module_variables[self.module]
+        
+        
+
+
 
     def do_set(self, line):
         """Use Tab To Show Variables You Can Set"""
@@ -74,6 +83,10 @@ class Handler(cmd.Cmd):
                 module = secondvalue = short_module_names[secondvalue]
                 self.variables = module_variables[module]
             setattr(self, firstvalue, secondvalue)
+            config.set('main' , 'Module' , self.defaultmodule)
+            config.set('main' , 'Payload' , self.defaultpayload)
+            with open('config.ini', 'w') as f:
+                config.write(f)
         except ValueError:
             print colours.RED + "==========================================" + colours.WHITE
             print colours.BLUE + "Please choose a option and a value to set!" + colours.WHITE
@@ -84,7 +97,7 @@ class Handler(cmd.Cmd):
         cmdtokens = line.split(' ')[:-1]
         if cmdtokens == ['set']:
             return [v for v in self.variables if v.startswith(text)]
-        elif cmdtokens == ['set', 'module']:
+        elif cmdtokens == ['set', 'module'] or cmdtokens ==['set', 'defaultmodule']:
             return [m for m in self.possible_modules if m.startswith(text)]
         elif cmdtokens == ['set', 'snmpversion']:
             return [g for g in self.possible_snmpversion if g.startswith(text)]
@@ -92,7 +105,7 @@ class Handler(cmd.Cmd):
             return [f for f in self.possible_community if f.startswith(text)]
         elif cmdtokens == ['set', 'username'] or cmdtokens == ['set', 'fromuser']:
             return [t for t in self.possible_usernames if t.startswith(text)]
-        elif cmdtokens == ['set', 'payload']:
+        elif cmdtokens == ['set', 'payload'] or cmdtokens == ['set', 'defaultpayload']:
             return [e for e in self.possible_payloads if e.startswith(text)]
         else:
             return []
