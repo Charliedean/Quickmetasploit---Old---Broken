@@ -16,6 +16,7 @@ config = SafeConfigParser()
 config.read('config.ini')
 DEFAULT_MODULE = config.get('main', 'Module')
 DEFAULT_PAYLOAD = config.get('main' , 'Payload')
+DEFAULT_LPORT = config.get('main' , 'Lport')
 
 COLOURS = ['\033[94m', '\033[92m', '\033[93m', '\033[91m', '\033[0m']
 
@@ -37,7 +38,7 @@ def get_ip_address(ifname): # Gets ip from interface using sockets
         struct.pack('256s', ifname[:15])
     )[20:24])
 
-default_variables = frozenset('iface module defaultmodule defaultpayload'.split())
+default_variables = frozenset('iface module defaultmodule defaultpayload defaultlport'.split())
 
 module_variables = defaultdict(lambda : default_variables)
 
@@ -55,7 +56,7 @@ short_module_names = {'smb_login': 'auxiliary/scanner/smb/smb_login',
                      }
 
 class Handler(cmd.Cmd):
-    lport = ''
+    lport = DEFAULT_LPORT
     payload = DEFAULT_PAYLOAD
     lhost = ''
     iface = 'eth0'
@@ -67,6 +68,7 @@ class Handler(cmd.Cmd):
     fromuser = 'root'
     community = 'public'
     snmpversion = '1'
+    defaultlport = config.get('main', 'Lport')
     defaultmodule = config.get('main', 'Module')
     defaultpayload = config.get('main', 'Payload')
     possible_modules = short_module_names.keys()
@@ -94,6 +96,7 @@ class Handler(cmd.Cmd):
             setattr(self, firstvalue, secondvalue)
             config.set('main' , 'Module' , self.defaultmodule)
             config.set('main' , 'Payload' , self.defaultpayload)
+            config.set('main' , 'Lport' , self.defaultlport)
 
         except ValueError:
             print colours.RED + "="*WIDTH                                       + colours.WHITE
@@ -200,6 +203,7 @@ if __name__ == '__main__':
     print colours.RED + "="*WIDTH                                             + colours.WHITE
     print colours.GREEN + "-- Default Module is %s" %DEFAULT_MODULE           + colours.WHITE
     print colours.GREEN + "-- Default Payload is %s" %DEFAULT_PAYLOAD         + colours.WHITE
+    print colours.GREEN + "-- Default Lport is %s" %DEFAULT_LPORT         + colours.WHITE
     print colours.RED + "="*WIDTH                                             + colours.WHITE
 
     while(True):
