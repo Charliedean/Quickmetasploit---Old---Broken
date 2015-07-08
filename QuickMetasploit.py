@@ -57,8 +57,8 @@ class Handler(cmd.Cmd):
     fromuser = 'root'
     community = 'public'
     snmpversion = '1'
-    defaultmodule = ''
-    defaultpayload = ''
+    defaultmodule = config.get('main', 'Module')
+    defaultpayload = config.get('main', 'Payload')
 #####################################################################################################################################################Possible strings for tab completetion
     possible_modules = short_module_names.keys()
     possible_snmpversion = ('1' ,'2c')
@@ -110,7 +110,7 @@ class Handler(cmd.Cmd):
         else:
             return []
 ########################################################################################################################################################################################
-    def do_showallpayloads(self, line):
+    def do_listallpayloads(self, line):
         """Shows All The Avalible Payloads"""
         subprocess.call(["msfcli", "multi/handler", "P"])
         
@@ -171,14 +171,16 @@ class Handler(cmd.Cmd):
 #########################################################################################################################################################################################
 ################################################################################################################################################################Used for import as modules
 if __name__ == '__main__':
-    print colours.RED + "========================================" + colours.WHITE
+    print colours.RED + "=====================================================" + colours.WHITE
     print colours.BLUE + "-- Quick Metasploit" + colours.WHITE
     print colours.BLUE + "-- Type Help To List All Commands" + colours.WHITE
     print colours.BLUE + "-- Type Help (Command) For Specific Help" + colours.WHITE
     print colours.BLUE + "-- Local Ip Will Be Automaticaly Set" + colours.WHITE
     print colours.BLUE + "-- CTRL + C To Exit" + colours.WHITE
-    print colours.RED + "========================================" + colours.WHITE
-    print colours.GREEN + "Default Module Is %s" %DEFAULT_MODULE+ colours.WHITE
+    print colours.BLUE + "-- Quick Metasploit Uses Defaults Set In Config.ini" +colours.WHITE
+    print colours.RED + "=====================================================" + colours.WHITE
+    print colours.GREEN + "Default Module Is %s" %DEFAULT_MODULE + colours.WHITE
+    print colours.GREEN + "Default Payload Is %s" %DEFAULT_PAYLOAD + colours.WHITE
 ##########################################################################################################################################################################################
 #############################################################################################################################################Catches Ctrl C and asks user for confirmation
     while(True):
