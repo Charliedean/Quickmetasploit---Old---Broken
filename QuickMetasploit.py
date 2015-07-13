@@ -1,5 +1,8 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 from collections import defaultdict
 from ConfigParser import SafeConfigParser
 import cmd 
@@ -11,7 +14,11 @@ import fcntl
 import struct
 import math
 import random
+import blessings
+import string
 
+term = blessings.Terminal() # terminal size
+width = term.width
 config = SafeConfigParser()
 config.read('config.ini')
 DEFAULT_MODULE = config.get('main', 'Module')
@@ -19,8 +26,6 @@ DEFAULT_PAYLOAD = config.get('main' , 'Payload')
 DEFAULT_LPORT = config.get('main' , 'Lport')
 
 COLOURS = ['\033[94m', '\033[92m', '\033[93m', '\033[91m', '\033[0m']
-
-WIDTH = 60 #Change to terminal size when updated
 
 class colours:
     BLUE = '\033[94m'
@@ -35,7 +40,7 @@ def get_ip_address(ifname): # Gets ip from interface using sockets
     return socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
         0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
+        struct.pack(b'256s', ifname[:15])
     )[20:24])
 
 default_variables = frozenset('iface module defaultmodule defaultpayload defaultlport'.split())
@@ -59,7 +64,7 @@ class Handler(cmd.Cmd):
     lport = DEFAULT_LPORT
     payload = DEFAULT_PAYLOAD
     lhost = ''
-    iface = 'eth0'
+    iface = b'eth0'
     module = short_module_names[DEFAULT_MODULE]
     rhosts = ''
     rhost = ''
@@ -91,7 +96,7 @@ class Handler(cmd.Cmd):
                 module = secondvalue = short_module_names[secondvalue]
                 self.variables = module_variables[module]
             elif firstvalue == 'iface':
-                secondvalue = iface = secondvalue
+                iface = secondvalue
                 self.lhost = get_ip_address(iface)
             setattr(self, firstvalue, secondvalue)
             config.set('main' , 'Module' , self.defaultmodule)
@@ -99,9 +104,9 @@ class Handler(cmd.Cmd):
             config.set('main' , 'Lport' , self.defaultlport)
 
         except ValueError:
-            print colours.RED + "="*WIDTH                                       + colours.WHITE
-            print colours.BLUE + "Please choose a option and a value to set!"   + colours.WHITE
-            print colours.RED + "="*WIDTH                                       + colours.WHITE
+            print colours.RED + "="*term.width                                       + colours.WHITE
+            print colours.BLUE + "Please choose a option and a value to set!".center(width, ' ')        + colours.WHITE
+            print colours.RED + "="*term.width                                       + colours.WHITE
 
     def do_easteregg(self, line):
         easter = raw_input("Enter The Code: ")
@@ -109,7 +114,7 @@ class Handler(cmd.Cmd):
         while True:
             if easter == "1337":
                 print " "*(49 - int(46*math.sin(counter))) + random.choice(COLOURS) + "**--CharlieDean--**--Dario--**--Alex--**" + '\033[0m'
-                print " "*(49 - int(46*math.cos(counter))) + random.choice(COLOURS) + "**--CharlieDean--**--Dario--**--Alex--**" + '\033[0m'
+                print " "*(49 - int(-46*math.sin(counter))) + random.choice(COLOURS) + "**--CharlieDean--**--Dario--**--Alex--**" + '\033[0m'
                 time.sleep(0.01)
                 counter += 0.1
             else:
@@ -145,34 +150,34 @@ class Handler(cmd.Cmd):
     def do_showoptions(self, line):
         """Shows Options For Module"""
         if self.module == "exploit/multi/handler":
-            print colours.RED +"="*WIDTH                                 + colours.WHITE
-            print colours.BLUE + "--payload =", self.payload             + colours.WHITE
-            print colours.BLUE + "--lhost =", self.lhost                 + colours.WHITE
-            print colours.BLUE + "--lport =", self.lport                 + colours.WHITE
-            print colours.BLUE + "--module =", self.module               + colours.WHITE
-            print colours.RED + "="*WIDTH                                + colours.WHITE
+            print colours.RED +"="*width                            + colours.WHITE
+            print colours.BLUE + ("payload = %s"% (self.payload)).center(width, ' ')             + colours.WHITE
+            print colours.BLUE + ("lhost = %s"% (self.lhost)).center(width, ' ')                 + colours.WHITE
+            print colours.BLUE + ("lport = %s"% (self.lport)).center(width, ' ')                 + colours.WHITE
+            print colours.BLUE + ("module = %s"% (self.module)).center(width, ' ')              + colours.WHITE
+            print colours.RED + "="*width                           + colours.WHITE
         elif self.module == "auxiliary/scanner/smb/smb_login":
-            print colours.RED + "="*WIDTH                                + colours.WHITE
-            print colours.BLUE + "--rhosts =", self.rhosts               + colours.WHITE
-            print colours.BLUE + "--rport =", self.rport                 + colours.WHITE
-            print colours.BLUE + "--module =", self.module               + colours.WHITE
-            print colours.RED + "="*WIDTH                                + colours.WHITE
+            print colours.RED + "="*width                           + colours.WHITE
+            print colours.BLUE + ("rhosts = %s"% (self.rhosts)).center(width, ' ')              + colours.WHITE
+            print colours.BLUE + ("rport = %s"% (self.rport)).center(width, ' ')                 + colours.WHITE
+            print colours.BLUE + ("module = %s"% (self.module)).center(width, ' ')               + colours.WHITE
+            print colours.RED + "="*width                           + colours.WHITE
         elif self.module == "auxiliary/scanner/rservices/rlogin_login":
-            print colours.RED + "="*WIDTH                                + colours.WHITE
-            print colours.BLUE + "--rhosts =", self.rhosts               + colours.WHITE
-            print colours.BLUE + "--rport =", self.rport                 + colours.WHITE
-            print colours.BLUE + "--module =", self.module               + colours.WHITE
-            print colours.BLUE + "--username =", self.username           + colours.WHITE
-            print colours.BLUE + "--fromuser =", self.fromuser           + colours.WHITE
-            print colours.RED + "="*WIDTH                                + colours.WHITE
+            print colours.RED + "="*width                           + colours.WHITE
+            print colours.BLUE + ("rhosts = %s"% (self.rhosts)).center(width, ' ')               + colours.WHITE
+            print colours.BLUE + ("rport = %s"% (self.rport)).center(width, ' ')                 + colours.WHITE
+            print colours.BLUE + ("module = %s"% (self.module)).center(width, ' ')              + colours.WHITE
+            print colours.BLUE + ("username = %s"% (self.username)).center(width, ' ')           + colours.WHITE
+            print colours.BLUE + ("fromuser = %s"% (self.fromuser)).center(width, ' ')           + colours.WHITE
+            print colours.RED + "="*width                           + colours.WHITE
         elif self.module == "auxiliary/scanner/snmp/snmp_enum":
-            print colours.RED + "="*WIDTH + colours.WHITE
-            print colours.BLUE + "--rhosts =", self.rhosts               + colours.WHITE
-            print colours.BLUE + "--rport =", self.rport                 + colours.WHITE
-            print colours.BLUE + "--module =", self.module               + colours.WHITE
-            print colours.BLUE + "--community =", self.community         + colours.WHITE
-            print colours.BLUE + "--snmpversion =", self.snmpversion     + colours.WHITE
-            print colours.RED + "="*WIDTH                                + colours.WHITE
+            print colours.RED + "="*width                           + colours.WHITE
+            print colours.BLUE + ("rhosts = %s"% (self.rhosts)).center(width, ' ')               + colours.WHITE
+            print colours.BLUE + ("rport = %s"% (self.rport)).center(width, ' ')                 + colours.WHITE
+            print colours.BLUE + ("module = %s"% (self.module)).center(width, ' ')               + colours.WHITE
+            print colours.BLUE + ("community = %s"% (self.community)).center(width, ' ')         + colours.WHITE
+            print colours.BLUE + ("snmpversion = %s"% (self.snmpversion)).center(width, ' ')     + colours.WHITE
+            print colours.RED + "="*width                           + colours.WHITE
         else:
             print "The module (%s) isn't supported yet!" % self.module
 
@@ -193,18 +198,19 @@ class Handler(cmd.Cmd):
             print "The module (%s) isn't supported yet!" % self.module
 
 if __name__ == '__main__':
-    print colours.RED + "="*WIDTH                                             + colours.WHITE
-    print colours.BLUE + "-- ––•–√\/––√\/––•––", colours.RED + "QuickMetasploit", colours.BLUE + "––•–√\/––√\/––•––" + colours.WHITE
-    print colours.BLUE + "-- Type Help To List All Commands"                  + colours.WHITE
-    print colours.BLUE + "-- Type Help (Command) For Specific Help"           + colours.WHITE
-    print colours.BLUE + "-- Local Ip Will Be Automaticaly Set"               + colours.WHITE
-    print colours.BLUE + "-- CTRL + C To Exit"                                + colours.WHITE
-    print colours.BLUE + "-- Written By CharlieDean"                          + colours.WHITE
-    print colours.RED + "="*WIDTH                                             + colours.WHITE
-    print colours.GREEN + "-- Default Module is %s" %DEFAULT_MODULE           + colours.WHITE
-    print colours.GREEN + "-- Default Payload is %s" %DEFAULT_PAYLOAD         + colours.WHITE
-    print colours.GREEN + "-- Default Lport is %s" %DEFAULT_LPORT         + colours.WHITE
-    print colours.RED + "="*WIDTH                                             + colours.WHITE
+    print colours.RED + "="*width
+    print colours.BLUE  + ("––•–√\/––√\/––•––" + colours.GREEN + "QuickMetasploit" + colours.BLUE + "––•–√\/––√\/––•––").center(width + 9, ' ')
+    print "Type Help To List All Commands".center(width, ' ')
+    print "Type Help (Command) For Specific Help".center(width, ' ')
+    print "Local Ip Will Be Automaticaly Set".center(width, ' ')
+    print "CTRL + C To Exit".center(width, ' ')
+    print "Written By CharlieDean".center(width, ' ')
+    print colours.RED   + "="*width
+    print colours.GREEN + ("Default Module is %s" %DEFAULT_MODULE).center(width, ' ')
+    print ("Default Payload is %s" %DEFAULT_PAYLOAD).center(width, ' ')
+    print ("Default Lport is %s" %DEFAULT_LPORT).center(width, ' ')
+    print colours.RED + "="*width + colours.WHITE
+    
 
     while(True):
         try:
@@ -217,7 +223,7 @@ if __name__ == '__main__':
                     time.sleep(0.05)
                     exit = raw_input (colours.GREEN + "\n\nAre You Sure You Want To Quit? y/[n] (>>)" + colours.WHITE)
                     if exit and exit.lower()[0] == "y":
-                        print colours.RED + "Exiting...*e48e13207341b6bffb7fb1622282247b*" + colours.WHITE
+                        print colours.RED + "Exiting...*e48e13207341b6bffb7fb1622282247b*"            + colours.WHITE
                         with open('config.ini', 'w') as f:
                             config.write(f)
                         sys.exit()
