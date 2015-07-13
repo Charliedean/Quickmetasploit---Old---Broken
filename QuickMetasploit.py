@@ -96,9 +96,10 @@ class Handler(cmd.Cmd):
 
         except ValueError:
             width = term.width
-            print term.red + "="*term.width +term.white
+            print term.on_black + ""
+            print term.red + "="*term.width
             print term.blue + "Please choose a option and a value to set!".center(width, ' ')
-            print term.red + "="*term.width +term.white
+            print term.red + "="*term.width +term.normal
 
     def do_easteregg(self, line):
         """OOoooohhh Secret"""
@@ -144,36 +145,41 @@ class Handler(cmd.Cmd):
         """Shows Options For Module"""
         width = term.width
         if self.module == "exploit/multi/handler":
-            print term.red +"="*width +term.white
+            print term.on_black + ""
+            print term.red +"="*width
             print term.blue + ("payload = %s"% (self.payload)).center(width, ' ')
             print term.blue + ("lhost = %s"% (self.lhost)).center(width, ' ')
             print term.blue + ("lport = %s"% (self.lport)).center(width, ' ')
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
-            print term.red + "="*width +term.white
+            print term.red + "="*width +term.normal
         elif self.module == "auxiliary/scanner/smb/smb_login":
-            print term.red + "="*width +term.white
+            print term.on_black + ""
+            print term.red + "="*width
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
             print term.blue + ("rport = %s"% (self.rport)).center(width, ' ')
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
-            print term.red + "="*width
+            print term.red + "="*width +term.normal
         elif self.module == "auxiliary/scanner/rservices/rlogin_login":
-            print term.red + "="*width +term.white
+            print term.on_black + ""
+            print term.red + "="*width
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
             print term.blue + ("rport = %s"% (self.rport)).center(width, ' ')
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
             print term.blue + ("username = %s"% (self.username)).center(width, ' ')
             print term.blue + ("fromuser = %s"% (self.fromuser)).center(width, ' ')
-            print term.red + "="*width +term.white
+            print term.red + "="*width +term.normal
         elif self.module == "auxiliary/scanner/snmp/snmp_enum":
-            print term.red + "="*width +term.white
+            print term.on_black + ""
+            print term.red + "="*width +term.normal
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
             print term.blue + ("rport = %s"% (self.rport)).center(width, ' ')
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
             print term.blue + ("community = %s"% (self.community)).center(width, ' ')
             print term.blue + ("snmpversion = %s"% (self.snmpversion)).center(width, ' ')
-            print term.red + "="*width +term.white
+            print term.red + "="*width +term.normal
         else:
-            print "The module (%s) isn't supported yet!" % self.module
+            print "The module (%s) isn't supported yet!" % self.module +term.normal
+
 
     def do_run(self, line):
         """Runs The Module With Settings"""
@@ -193,18 +199,19 @@ class Handler(cmd.Cmd):
 
 if __name__ == '__main__':
     width = term.width
-    print term.red + "="*width +term.white
+    print term.on_black + ""
+    print term.red + "="*width
     print term.blue  + ("––•–√\/––√\/––•––" + term.green + "QuickMetasploit" + term.blue + "––•–√\/––√\/––•––").center(width + 9, ' ')
     print term.blue  + "Type Help To List All Commands".center(width, ' ')
     print term.blue  + "Type Help (Command) For Specific Help".center(width, ' ')
     print term.blue  + "Local Ip Will Be Automaticaly Set".center(width, ' ')
     print term.blue  + "CTRL + C To Exit".center(width, ' ')
     print term.blue  + "Written By CharlieDean".center(width, ' ')
-    print term.red   + "="*width +term.white
+    print term.red   + "="*width
     print term.green + ("Default Module is %s" %DEFAULT_MODULE).center(width, ' ')
     print term.green  + ("Default Payload is %s" %DEFAULT_PAYLOAD).center(width, ' ')
     print term.green  + ("Default Lport is %s" %DEFAULT_LPORT).center(width, ' ')
-    print term.red + "="*width +term.white
+    print term.red + "="*width +term.normal
     
 
     while(True):
