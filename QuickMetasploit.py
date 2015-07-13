@@ -82,7 +82,6 @@ class Handler(cmd.Cmd):
     def do_set(self, line):
         """Use Tab To Show Variables You Can Set"""
         print term.clear
-        self.do_showoptions(None)
         try:
             firstvalue, secondvalue = line.split()
             if firstvalue == 'module':
@@ -95,6 +94,14 @@ class Handler(cmd.Cmd):
             config.set('main' , 'Module' , self.defaultmodule)
             config.set('main' , 'Payload' , self.defaultpayload)
             config.set('main' , 'Lport' , self.defaultlport)
+            self.do_showoptions(None)
+        except KeyError:
+            width = term.width
+            print term.clear
+            print term.on_black + ""
+            print term.red + "="*term.width
+            print term.blue + "You Typed An Incorrect Value!".center(width, ' ')
+            print term.red + "="*term.width +term.normal
 
         except ValueError:
             width = term.width
@@ -179,7 +186,7 @@ class Handler(cmd.Cmd):
         elif self.module == "auxiliary/scanner/snmp/snmp_enum":
             print term.clear
             print term.on_black + ""
-            print term.red + "="*width +term.normal
+            print term.red + "="*width
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
             print term.blue + ("rport = %s"% (self.rport)).center(width, ' ')
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
