@@ -24,7 +24,7 @@ DEFAULT_MODULE = config.get('main', 'Module')
 DEFAULT_PAYLOAD = config.get('main' , 'Payload')
 DEFAULT_LPORT = config.get('main' , 'Lport')
 
-COLOURS = [term.red, term.blue, term.green, term.yellow, term.magenta]
+COLOURS = [term.red_bold, term.blue_bold, term.green_bold, term.yellow_bold, term.magenta_bold]
 
 def get_ip_address(ifname): # Gets ip from interface using sockets
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -98,16 +98,18 @@ class Handler(cmd.Cmd):
         except KeyError:
             width = term.width
             print term.clear
+            self.do_showoptions(None)
             print term.on_black + ""
-            print term.red + "="*term.width
+            print term.red_bold + "="*term.width
             print term.blue + "You Typed An Incorrect Value!".center(width, ' ')
             print term.red + "="*term.width +term.normal
 
         except ValueError:
             width = term.width
             print term.clear
+            self.do_showoptions(None)
             print term.on_black + ""
-            print term.red + "="*term.width
+            print term.red_bold + "="*term.width
             print term.blue + "Please choose a option and a value to set!".center(width, ' ')
             print term.red + "="*term.width +term.normal
 
@@ -159,7 +161,7 @@ class Handler(cmd.Cmd):
         if self.module == "exploit/multi/handler":
             print term.clear
             print term.on_black + ""
-            print term.red +"="*width
+            print term.red_bold +"="*width
             print term.blue + ("payload = %s"% (self.payload)).center(width, ' ')
             print term.blue + ("lhost = %s"% (self.lhost)).center(width, ' ')
             print term.blue + ("lport = %s"% (self.lport)).center(width, ' ')
@@ -168,7 +170,7 @@ class Handler(cmd.Cmd):
         elif self.module == "auxiliary/scanner/smb/smb_login":
             print term.clear
             print term.on_black + ""
-            print term.red + "="*width
+            print term.red_bold + "="*width
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
             print term.blue + ("rport = %s"% (self.rport)).center(width, ' ')
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
@@ -176,7 +178,7 @@ class Handler(cmd.Cmd):
         elif self.module == "auxiliary/scanner/rservices/rlogin_login":
             print term.clear
             print term.on_black + ""
-            print term.red + "="*width
+            print term.red_bold + "="*width
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
             print term.blue + ("rport = %s"% (self.rport)).center(width, ' ')
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
@@ -186,7 +188,7 @@ class Handler(cmd.Cmd):
         elif self.module == "auxiliary/scanner/snmp/snmp_enum":
             print term.clear
             print term.on_black + ""
-            print term.red + "="*width
+            print term.red_bold + "="*width
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
             print term.blue + ("rport = %s"% (self.rport)).center(width, ' ')
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
@@ -217,7 +219,7 @@ if __name__ == '__main__':
     print term.clear
     width = term.width
     print term.on_black + ""
-    print term.red + "="*width
+    print term.red_bold + "="*width
     print term.blue  + ("––•–√\/––√\/––•––" + term.green + "QuickMetasploit" + term.blue + "––•–√\/––√\/––•––").center(width + 9, ' ')
     print term.blue  + "Type Help To List All Commands".center(width, ' ')
     print term.blue  + "Type Help (Command) For Specific Help".center(width, ' ')
@@ -240,7 +242,7 @@ if __name__ == '__main__':
             while(True):
                 try:
                     time.sleep(0.05)
-                    exit = raw_input (term.green + "\n\nAre You Sure You Want To Quit? y/[n] (>>)")
+                    exit = raw_input (term.green_bold + "\n\nAre You Sure You Want To Quit? y/[n] (>>)")
                     if exit and exit.lower()[0] == "y":
                         print term.red + "Exiting...*e48e13207341b6bffb7fb1622282247b*"
                         with open('config.ini', 'w') as f:
