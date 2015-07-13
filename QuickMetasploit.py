@@ -81,6 +81,8 @@ class Handler(cmd.Cmd):
 
     def do_set(self, line):
         """Use Tab To Show Variables You Can Set"""
+        print term.clear
+        self.do_showoptions(None)
         try:
             firstvalue, secondvalue = line.split()
             if firstvalue == 'module':
@@ -96,6 +98,7 @@ class Handler(cmd.Cmd):
 
         except ValueError:
             width = term.width
+            print term.clear
             print term.on_black + ""
             print term.red + "="*term.width
             print term.blue + "Please choose a option and a value to set!".center(width, ' ')
@@ -103,6 +106,7 @@ class Handler(cmd.Cmd):
 
     def do_easteregg(self, line):
         """OOoooohhh Secret"""
+        print term.clear
         easter = raw_input("Enter The Code: ")
         counter = 0
         while True:
@@ -116,6 +120,7 @@ class Handler(cmd.Cmd):
 
     def do_listallpayloads(self, line):
         """Shows All The Avalible Payloads"""
+        print term.clear
         subprocess.call(["msfcli", "multi/handler", "P"])
 
     def do_exit(self, line):
@@ -145,6 +150,7 @@ class Handler(cmd.Cmd):
         """Shows Options For Module"""
         width = term.width
         if self.module == "exploit/multi/handler":
+            print term.clear
             print term.on_black + ""
             print term.red +"="*width
             print term.blue + ("payload = %s"% (self.payload)).center(width, ' ')
@@ -153,6 +159,7 @@ class Handler(cmd.Cmd):
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
             print term.red + "="*width +term.normal
         elif self.module == "auxiliary/scanner/smb/smb_login":
+            print term.clear
             print term.on_black + ""
             print term.red + "="*width
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
@@ -160,6 +167,7 @@ class Handler(cmd.Cmd):
             print term.blue + ("module = %s"% (self.module)).center(width, ' ')
             print term.red + "="*width +term.normal
         elif self.module == "auxiliary/scanner/rservices/rlogin_login":
+            print term.clear
             print term.on_black + ""
             print term.red + "="*width
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
@@ -169,6 +177,7 @@ class Handler(cmd.Cmd):
             print term.blue + ("fromuser = %s"% (self.fromuser)).center(width, ' ')
             print term.red + "="*width +term.normal
         elif self.module == "auxiliary/scanner/snmp/snmp_enum":
+            print term.clear
             print term.on_black + ""
             print term.red + "="*width +term.normal
             print term.blue + ("rhosts = %s"% (self.rhosts)).center(width, ' ')
@@ -198,6 +207,7 @@ class Handler(cmd.Cmd):
             print "The module (%s) isn't supported yet!" % self.module
 
 if __name__ == '__main__':
+    print term.clear
     width = term.width
     print term.on_black + ""
     print term.red + "="*width
