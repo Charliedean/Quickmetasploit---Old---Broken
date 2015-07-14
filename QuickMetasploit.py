@@ -16,6 +16,8 @@ import math
 import random
 import blessings
 import string
+import shlex
+import re
 
 term = blessings.Terminal() # terminal size
 config = SafeConfigParser()
@@ -79,6 +81,23 @@ class Handler(cmd.Cmd):
         self.lhost = get_ip_address(self.iface)
         self.variables = module_variables[self.module]
 
+    def do_nmap(self, arg):
+        """Runs an nmap scan with Specified options and specified ip"""
+        result = subprocess.check_output(['nmap'] + shlex.split(arg))
+        print result
+        try:
+            if result.index('shell'):
+                print "RLOGIN is open!"
+                self.module  = 'rlogin_login'
+                self.module = short_module_names[self.module]
+                self.variables = module_variables[self.module]
+                print "Setting Module to %s"%(self.module)
+                ip = re.search('Nmap scan report for (.+)' , result).group(1)
+                self.rhosts = ip
+                print "Setting Rhosts to %s"%(ip)
+        except ValueError:
+            print "RLOGIN isnt open!"
+
     def do_set(self, line):
         """Use Tab To Show Variables You Can Set"""
         print term.clear
@@ -95,6 +114,7 @@ class Handler(cmd.Cmd):
             config.set('main' , 'Payload' , self.defaultpayload)
             config.set('main' , 'Lport' , self.defaultlport)
             self.do_showoptions(None)
+            
         except KeyError:
             width = term.width
             print term.clear
@@ -242,7 +262,7 @@ if __name__ == '__main__':
             while(True):
                 try:
                     time.sleep(0.05)
-                    exit = raw_input (term.green_bold + "\n\nAre You Sure You Want To Quit? y/[n] (>>)")
+                    exit = raw_input (term.green_bold + "\n\nAre You Sure You Want To Quit? y/[n] (>>)" +term.normal)
                     if exit and exit.lower()[0] == "y":
                         print term.red + "Exiting...*e48e13207341b6bffb7fb1622282247b*"
                         with open('config.ini', 'w') as f:
