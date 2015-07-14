@@ -86,7 +86,7 @@ class Handler(cmd.Cmd):
         result = subprocess.check_output(['nmap'] + shlex.split(arg))
         print result
         try:
-            if result.index('shell'):
+            if  re.search('514/tcp', result):
                 print "RLOGIN is open!"
                 self.module  = 'rlogin_login'
                 self.module = short_module_names[self.module]
